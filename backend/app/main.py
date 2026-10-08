@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.health import router as health_router
 from app.api.syllabus import router as syllabus_router
+from app.api.study import router as study_router
+from app.api.project import router as project_router
 
 
 @asynccontextmanager
@@ -24,3 +26,5 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(syllabus_router)
+app.include_router(study_router)
+app.include_router(project_router)

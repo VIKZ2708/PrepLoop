@@ -1,63 +1,158 @@
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getTodaySyllabus, type SyllabusItem } from "../api/client";
+import { getTodaySyllabus } from "../api/client";
 
-const TRACKS: { id: string; label: string; emoji: string; color: string }[] = [
-  { id: "sd1", label: "System Design Vol 1", emoji: "🏗️", color: "border-blue-500 bg-blue-50" },
-  { id: "sd2", label: "System Design Vol 2", emoji: "⚙️", color: "border-purple-500 bg-purple-50" },
-  { id: "ai",  label: "AI Engineering",      emoji: "🤖", color: "border-green-500 bg-green-50" },
-];
-
-function TrackCard({ track }: { track: { id: string; label: string; emoji: string; color: string } }) {
-  const { data, isLoading, isError } = useQuery<SyllabusItem>({
-    queryKey: ["syllabus", track.id],
-    queryFn: () => getTodaySyllabus(track.id),
+function StudyCard() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["syllabus", "sd1"],
+    queryFn: () => getTodaySyllabus("sd1"),
     retry: 1,
   });
 
   return (
-    <div className={`rounded-2xl border-2 p-6 shadow-sm ${track.color}`}>
-      <div className="mb-3 flex items-center gap-2">
-        <span className="text-2xl">{track.emoji}</span>
-        <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">
-          {track.label}
-        </span>
-      </div>
-
-      {isLoading && (
-        <div className="h-6 w-3/4 animate-pulse rounded bg-gray-200" />
-      )}
-
-      {isError && (
-        <p className="text-sm text-red-500">Could not load today's topic.</p>
-      )}
-
-      {data && (
-        <>
-          <h2 className="mb-2 text-xl font-bold text-gray-900">
+    <Link to="/study?track=sd1" className="group block">
+      <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22] p-6 card-glow transition-all duration-200 group-hover:border-[#0071e3]">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">📚</span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">Afternoon</p>
+              <p className="text-xs text-[#3d444d]">40–60 min</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-medium text-[#0071e3]">Active</span>
+        </div>
+        <h3 className="mb-1 text-lg font-bold text-[#e6edf3]">Study</h3>
+        {isLoading ? (
+          <div className="h-4 w-3/4 animate-pulse rounded bg-[#21262d]" />
+        ) : data ? (
+          <p className="text-sm text-[#8b949e] leading-snug">
             Day {data.day_no} — {data.title}
-          </h2>
-          <p className="text-sm leading-relaxed text-gray-700">{data.description}</p>
-        </>
-      )}
+          </p>
+        ) : null}
+        <p className="mt-4 text-xs text-[#0071e3] group-hover:underline">Open workspace →</p>
+      </div>
+    </Link>
+  );
+}
+
+function BuildCard() {
+  return (
+    <Link to="/project" className="group block">
+      <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22] p-6 card-glow transition-all duration-200 group-hover:border-[#0071e3]">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🔨</span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">Evening</p>
+              <p className="text-xs text-[#3d444d]">45–60 min</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-medium text-[#0071e3]">Active</span>
+        </div>
+        <h3 className="mb-1 text-lg font-bold text-[#e6edf3]">Build</h3>
+        <p className="text-sm text-[#8b949e] leading-snug">Tasks, milestones, daily build log</p>
+        <p className="mt-4 text-xs text-[#0071e3] group-hover:underline">Open tracker →</p>
+      </div>
+    </Link>
+  );
+}
+
+function ComingSoonCard({
+  emoji,
+  slot,
+  duration,
+  title,
+  subtitle,
+  phase,
+}: {
+  emoji: string;
+  slot: string;
+  duration: string;
+  title: string;
+  subtitle: string;
+  phase: string;
+}) {
+  return (
+    <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22]/60 p-6 opacity-60">
+      <div className="mb-4 flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{emoji}</span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">{slot}</p>
+            <p className="text-xs text-[#3d444d]">{duration}</p>
+          </div>
+        </div>
+        <span className="rounded-full bg-[#21262d] px-2 py-0.5 text-xs font-medium text-[#3d444d]">{phase}</span>
+      </div>
+      <h3 className="mb-1 text-lg font-bold text-[#8b949e]">{title}</h3>
+      <p className="text-sm text-[#3d444d] leading-snug">{subtitle}</p>
     </div>
   );
 }
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-10 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900">
-            PrepLoop
+    <div className="min-h-screen bg-[#0d1117] text-[#e6edf3]">
+      {/* Nav */}
+      <div className="border-b border-[#21262d] px-6 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <span className="text-xl font-bold gradient-text">PrepLoop</span>
+          <span className="text-xs text-[#8b949e]">
+            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+          </span>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        {/* Hero */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-extrabold tracking-tight">
+            Today's Loop
           </h1>
-          <p className="mt-2 text-gray-500">Today's study plan</p>
+          <p className="mt-1 text-[#8b949e]">Four sessions. One continuous loop.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-          {TRACKS.map((t) => (
-            <TrackCard key={t.id} track={t} />
-          ))}
+        {/* 4 cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ComingSoonCard
+            emoji="☀️"
+            slot="Morning"
+            duration="5 min"
+            title="Recap"
+            subtitle="Yesterday's summary, quiz scores, weak spots, 3 recall questions"
+            phase="Phase 5"
+          />
+          <StudyCard />
+          <BuildCard />
+          <ComingSoonCard
+            emoji="🌙"
+            slot="Night"
+            duration="15–20 min"
+            title="Quiz"
+            subtitle="60% today's material + 40% spaced repetition, AI-graded"
+            phase="Phase 3"
+          />
+        </div>
+
+        {/* Quick links */}
+        <div className="mt-8 rounded-xl border border-[#21262d] bg-[#161b22] p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#8b949e]">All Tracks</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { track: "sd1", label: "System Design Vol 1" },
+              { track: "sd2", label: "System Design Vol 2" },
+              { track: "ai",  label: "AI Engineering" },
+            ].map(({ track, label }) => (
+              <Link
+                key={track}
+                to={`/study?track=${track}`}
+                className="rounded-lg border border-[#30363d] bg-[#0d1117] px-3 py-1.5 text-xs text-[#8b949e] hover:border-[#0071e3] hover:text-[#e6edf3] transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>

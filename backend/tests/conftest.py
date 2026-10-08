@@ -1,10 +1,16 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy import delete
+from sqlalchemy import delete, select, func
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.main import app
-from app.core.db import AsyncSessionLocal
+from app.core.config import settings
 from app.models.models import SyllabusItem
+
+# Separate engine with NullPool so fixtures don't conflict with the app's pool
+_engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
+_Session = async_sessionmaker(_engine, expire_on_commit=False)
 
 
 @pytest.fixture
@@ -15,23 +21,26 @@ async def client():
 
 @pytest.fixture
 async def seeded_sd1(client):
-    """Ensures at least one sd1 syllabus item exists; cleans up test-only items after."""
-    async with AsyncSessionLocal() as session:
-        from sqlalchemy import select, func
+    """Ensures ≥1 sd1 syllabus item exists; inserts a minimal one only if DB is empty."""
+    async with _Session() as session:
         result = await session.execute(
             select(func.count(SyllabusItem.id)).where(SyllabusItem.track == "sd1")
         )
-        if result.scalar():
-            yield
-            return
+        count = result.scalar()
 
-        item = SyllabusItem(track="sd1", day_no=1, title="Test Item", description="Test description")
+    if count:
+        yield
+        return
+
+    # Insert a minimal item so /study/today?track=sd1 has something to anchor to
+    async with _Session() as session:
+        item = SyllabusItem(track="sd1", day_no=1, title="Test Item", description="Test")
         session.add(item)
         await session.commit()
-        item_id = item.id
+        inserted_id = item.id
 
     yield
 
-    async with AsyncSessionLocal() as session:
-        await session.execute(delete(SyllabusItem).where(SyllabusItem.id == item_id))
+    async with _Session() as session:
+        await session.execute(delete(SyllabusItem).where(SyllabusItem.id == inserted_id))
         await session.commit()
