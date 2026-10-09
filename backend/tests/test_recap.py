@@ -31,6 +31,14 @@ def mock_build():
 
 @pytest.mark.asyncio
 async def test_get_today_recap_returns_404_when_not_built(client):
+    # Delete any recap that may exist from a previous test run against the shared DB
+    from datetime import date as _date
+    from sqlalchemy import delete as _delete
+    from app.models.models import DailyRecap as _DR
+    async with _Session() as s:
+        await s.execute(_delete(_DR).where(_DR.date == _date.today()))
+        await s.commit()
+
     resp = await client.get("/recap/today")
     assert resp.status_code == 404
 

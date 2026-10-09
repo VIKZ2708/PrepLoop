@@ -102,38 +102,6 @@ function QuizCard() {
   );
 }
 
-function ComingSoonCard({
-  emoji,
-  slot,
-  duration,
-  title,
-  subtitle,
-  phase,
-}: {
-  emoji: string;
-  slot: string;
-  duration: string;
-  title: string;
-  subtitle: string;
-  phase: string;
-}) {
-  return (
-    <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22]/60 p-6 opacity-60">
-      <div className="mb-4 flex items-start justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">{emoji}</span>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">{slot}</p>
-            <p className="text-xs text-[#3d444d]">{duration}</p>
-          </div>
-        </div>
-        <span className="rounded-full bg-[#21262d] px-2 py-0.5 text-xs font-medium text-[#3d444d]">{phase}</span>
-      </div>
-      <h3 className="mb-1 text-lg font-bold text-[#8b949e]">{title}</h3>
-      <p className="text-sm text-[#3d444d] leading-snug">{subtitle}</p>
-    </div>
-  );
-}
 
 export default function Dashboard() {
   return (
