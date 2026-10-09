@@ -117,6 +117,13 @@ export interface AnswerResponse {
   is_correct: boolean;
   correct_answer: string;
   explanation: string | null;
+  ai_score: number | null;
+  ai_feedback: string | null;
+}
+
+export interface TeachBackResponse {
+  critique: string;
+  follow_up_questions: string[];
 }
 
 export interface QuizFinishResponse {
@@ -143,4 +150,17 @@ export function submitAnswer(
 
 export function finishQuiz(attemptId: number): Promise<QuizFinishResponse> {
   return apiFetch(`/quiz/${attemptId}/finish`, { method: "POST" });
+}
+
+// ── Teach-back ────────────────────────────────────────────────────────────────
+
+export function submitTeachBack(
+  sessionId: number,
+  explanation: string,
+  topic?: string
+): Promise<TeachBackResponse> {
+  return apiFetch(`/study/${sessionId}/teach-back`, {
+    method: "POST",
+    body: JSON.stringify({ explanation, topic }),
+  });
 }

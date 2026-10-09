@@ -15,6 +15,7 @@ from app.schemas.quiz import (
     QuizStartResponse,
 )
 from app.services.quiz_generator import generate_questions
+from app.services.grader import grade_answer
 
 router = APIRouter(prefix="/quiz", tags=["quiz"])
 
@@ -89,13 +90,25 @@ async def submit_answer(attempt_id: int, body: AnswerRequest, db: DB):
     if not question:
         raise HTTPException(404, "Question not found")
 
-    is_correct = body.user_answer.strip().lower() == question.answer.strip().lower()
+    ai_score: float | None = None
+    ai_feedback: str | None = None
+
+    if question.type == "mcq":
+        is_correct = body.user_answer.strip().lower() == question.answer.strip().lower()
+    else:
+        # Grade open/short/design answers with Haiku
+        grade = grade_answer(question.prompt, question.answer, body.user_answer)
+        ai_score = float(grade.score)
+        ai_feedback = grade.feedback
+        is_correct = grade.score >= 6  # ≥6/10 counts as correct
 
     answer = Answer(
         quiz_attempt_id=attempt_id,
         question_id=question.id,
         user_answer=body.user_answer,
         is_correct=is_correct,
+        ai_score=ai_score,
+        ai_feedback=ai_feedback,
     )
     db.add(answer)
     await db.commit()
@@ -104,6 +117,8 @@ async def submit_answer(attempt_id: int, body: AnswerRequest, db: DB):
         is_correct=is_correct,
         correct_answer=question.answer,
         explanation=question.explanation,
+        ai_score=ai_score,
+        ai_feedback=ai_feedback,
     )
 
 

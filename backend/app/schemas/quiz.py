@@ -43,6 +43,8 @@ class AnswerResponse(BaseModel):
     is_correct: bool
     correct_answer: str
     explanation: Optional[str]
+    ai_score: Optional[float] = None      # set for short/design questions
+    ai_feedback: Optional[str] = None     # set for short/design questions
 
 
 class QuizFinishResponse(BaseModel):

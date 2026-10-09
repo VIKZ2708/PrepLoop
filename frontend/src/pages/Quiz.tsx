@@ -205,15 +205,32 @@ export default function Quiz() {
                   ? "border-green-700/40 bg-green-900/10"
                   : "border-red-700/40 bg-red-900/10"
               }`}>
-                <p className={`font-semibold ${phase.feedback.is_correct ? "text-green-400" : "text-red-400"}`}>
-                  {phase.feedback.is_correct ? "✓ Correct!" : "✗ Not quite"}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className={`font-semibold ${phase.feedback.is_correct ? "text-green-400" : "text-red-400"}`}>
+                    {phase.feedback.is_correct ? "✓ Correct!" : "✗ Not quite"}
+                  </p>
+                  {/* AI score badge for short/design answers */}
+                  {phase.feedback.ai_score !== null && phase.feedback.ai_score !== undefined && (
+                    <span className={`rounded-full px-3 py-0.5 text-sm font-bold ${
+                      phase.feedback.ai_score >= 8 ? "bg-green-900/30 text-green-400" :
+                      phase.feedback.ai_score >= 6 ? "bg-blue-900/30 text-[#0071e3]" :
+                      "bg-red-900/30 text-red-400"
+                    }`}>
+                      {phase.feedback.ai_score}/10
+                    </span>
+                  )}
+                </div>
                 {!phase.feedback.is_correct && q.type === "mcq" && (
                   <p className="mt-1 text-sm text-[#8b949e]">
                     Correct answer: <span className="text-[#e6edf3]">{phase.feedback.correct_answer}</span>
                   </p>
                 )}
-                {phase.feedback.explanation && (
+                {/* AI feedback for open answers */}
+                {phase.feedback.ai_feedback && (
+                  <p className="mt-2 text-sm text-[#8b949e] leading-relaxed">{phase.feedback.ai_feedback}</p>
+                )}
+                {/* Standard explanation for MCQ */}
+                {!phase.feedback.ai_feedback && phase.feedback.explanation && (
                   <p className="mt-2 text-sm text-[#8b949e] leading-relaxed">{phase.feedback.explanation}</p>
                 )}
                 <button
