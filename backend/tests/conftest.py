@@ -9,17 +9,19 @@ from app.core.config import settings
 from app.models.models import SyllabusItem
 
 # Separate engine with NullPool so fixtures don't conflict with the app's pool
-_engine = create_async_engine(settings.DATABASE_URL, poolclass=NullPool)
+_engine = create_async_engine(
+    settings.DATABASE_URL, poolclass=NullPool, connect_args={"statement_cache_size": 0}
+)
 _Session = async_sessionmaker(_engine, expire_on_commit=False)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 async def seeded_sd1(client):
     """Ensures ≥1 sd1 syllabus item exists; inserts a minimal one only if DB is empty."""
     async with _Session() as session:

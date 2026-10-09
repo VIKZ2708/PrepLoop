@@ -58,6 +58,28 @@ function BuildCard() {
   );
 }
 
+function QuizCard() {
+  return (
+    <Link to="/quiz?track=sd1" className="group block">
+      <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22] p-6 card-glow transition-all duration-200 group-hover:border-[#0071e3]">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">🌙</span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">Night</p>
+              <p className="text-xs text-[#3d444d]">15–20 min</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-medium text-[#0071e3]">Active</span>
+        </div>
+        <h3 className="mb-1 text-lg font-bold text-[#e6edf3]">Quiz</h3>
+        <p className="text-sm text-[#8b949e] leading-snug">5 questions from today's notes, graded instantly</p>
+        <p className="mt-4 text-xs text-[#0071e3] group-hover:underline">Start quiz →</p>
+      </div>
+    </Link>
+  );
+}
+
 function ComingSoonCard({
   emoji,
   slot,
@@ -125,14 +147,7 @@ export default function Dashboard() {
           />
           <StudyCard />
           <BuildCard />
-          <ComingSoonCard
-            emoji="🌙"
-            slot="Night"
-            duration="15–20 min"
-            title="Quiz"
-            subtitle="60% today's material + 40% spaced repetition, AI-graded"
-            phase="Phase 3"
-          />
+          <QuizCard />
         </div>
 
         {/* Quick links */}

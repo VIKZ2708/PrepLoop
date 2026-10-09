@@ -7,6 +7,7 @@ from app.api.health import router as health_router
 from app.api.syllabus import router as syllabus_router
 from app.api.study import router as study_router
 from app.api.project import router as project_router
+from app.api.quiz import router as quiz_router
 
 
 @asynccontextmanager
@@ -28,3 +29,4 @@ app.include_router(health_router)
 app.include_router(syllabus_router)
 app.include_router(study_router)
 app.include_router(project_router)
+app.include_router(quiz_router)

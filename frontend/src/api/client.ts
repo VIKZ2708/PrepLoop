@@ -97,3 +97,50 @@ export function upsertTodayLog(data: {
 }): Promise<ProjectLog> {
   return apiFetch("/project/log/today", { method: "PUT", body: JSON.stringify(data) });
 }
+
+// ── Quiz ──────────────────────────────────────────────────────────────────────
+
+export interface QuizQuestion {
+  id: number;
+  type: string;
+  prompt: string;
+  options: string[] | null;
+  difficulty: string;
+}
+
+export interface QuizStartResponse {
+  attempt_id: number;
+  questions: QuizQuestion[];
+}
+
+export interface AnswerResponse {
+  is_correct: boolean;
+  correct_answer: string;
+  explanation: string | null;
+}
+
+export interface QuizFinishResponse {
+  attempt_id: number;
+  score: number;
+  correct: number;
+  total: number;
+}
+
+export function startQuiz(track: string): Promise<QuizStartResponse> {
+  return apiFetch(`/quiz/start?track=${track}`, { method: "POST" });
+}
+
+export function submitAnswer(
+  attemptId: number,
+  questionId: number,
+  userAnswer: string
+): Promise<AnswerResponse> {
+  return apiFetch(`/quiz/${attemptId}/answer`, {
+    method: "POST",
+    body: JSON.stringify({ question_id: questionId, user_answer: userAnswer }),
+  });
+}
+
+export function finishQuiz(attemptId: number): Promise<QuizFinishResponse> {
+  return apiFetch(`/quiz/${attemptId}/finish`, { method: "POST" });
+}
