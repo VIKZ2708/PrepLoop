@@ -58,6 +58,28 @@ function BuildCard() {
   );
 }
 
+function RecapCard() {
+  return (
+    <Link to="/recap" className="group block">
+      <div className="h-full rounded-2xl border border-[#21262d] bg-[#161b22] p-6 card-glow transition-all duration-200 group-hover:border-[#0071e3]">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">☀️</span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">Morning</p>
+              <p className="text-xs text-[#3d444d]">5 min</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-medium text-[#0071e3]">Active</span>
+        </div>
+        <h3 className="mb-1 text-lg font-bold text-[#e6edf3]">Recap</h3>
+        <p className="text-sm text-[#8b949e] leading-snug">Yesterday's summary, weak spots, 3 recall questions</p>
+        <p className="mt-4 text-xs text-[#0071e3] group-hover:underline">Open recap →</p>
+      </div>
+    </Link>
+  );
+}
+
 function QuizCard() {
   return (
     <Link to="/quiz?track=sd1" className="group block">
@@ -137,14 +159,7 @@ export default function Dashboard() {
 
         {/* 4 cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <ComingSoonCard
-            emoji="☀️"
-            slot="Morning"
-            duration="5 min"
-            title="Recap"
-            subtitle="Yesterday's summary, quiz scores, weak spots, 3 recall questions"
-            phase="Phase 5"
-          />
+          <RecapCard />
           <StudyCard />
           <BuildCard />
           <QuizCard />
@@ -152,7 +167,10 @@ export default function Dashboard() {
 
         {/* Quick links */}
         <div className="mt-8 rounded-xl border border-[#21262d] bg-[#161b22] p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[#8b949e]">All Tracks</p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#8b949e]">All Tracks</p>
+            <Link to="/curriculum" className="text-xs text-[#0071e3] hover:underline">View full curriculum →</Link>
+          </div>
           <div className="flex flex-wrap gap-2">
             {[
               { track: "sd1", label: "System Design Vol 1" },

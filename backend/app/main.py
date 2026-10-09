@@ -8,11 +8,19 @@ from app.api.syllabus import router as syllabus_router
 from app.api.study import router as study_router
 from app.api.project import router as project_router
 from app.api.quiz import router as quiz_router
+from app.api.recap import router as recap_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    yield
+    # APScheduler only runs in local dev; Vercel uses cron → POST /recap/build
+    if settings.ENV != "production":
+        from app.jobs.scheduler import start_scheduler, stop_scheduler
+        start_scheduler()
+        yield
+        stop_scheduler()
+    else:
+        yield
 
 
 app = FastAPI(title="PrepLoop API", version="0.1.0", lifespan=lifespan)
@@ -30,3 +38,4 @@ app.include_router(syllabus_router)
 app.include_router(study_router)
 app.include_router(project_router)
 app.include_router(quiz_router)
+app.include_router(recap_router)

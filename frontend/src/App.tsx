@@ -3,6 +3,8 @@ import Dashboard from "./pages/Dashboard";
 import Study from "./pages/Study";
 import Project from "./pages/Project";
 import Quiz from "./pages/Quiz";
+import Recap from "./pages/Recap";
+import Curriculum from "./pages/Curriculum";
 
 export default function App() {
   return (
@@ -13,6 +15,8 @@ export default function App() {
         <Route path="/study" element={<Study />} />
         <Route path="/project" element={<Project />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/recap" element={<Recap />} />
+        <Route path="/curriculum" element={<Curriculum />} />
       </Routes>
     </BrowserRouter>
   );

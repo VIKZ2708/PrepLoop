@@ -8,5 +8,11 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "api/index.py" }
+  ],
+  "crons": [
+    {
+      "path": "/recap/build",
+      "schedule": "30 0 * * *"
+    }
   ]
 }

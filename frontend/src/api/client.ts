@@ -152,6 +152,47 @@ export function finishQuiz(attemptId: number): Promise<QuizFinishResponse> {
   return apiFetch(`/quiz/${attemptId}/finish`, { method: "POST" });
 }
 
+// ── Curriculum ───────────────────────────────────────────────────────────────
+
+export interface SyllabusItemWithStatus {
+  id: number;
+  track: string;
+  day_no: number;
+  title: string;
+  description: string;
+  completed: boolean;
+  is_today: boolean;
+}
+
+export interface CurriculumResponse {
+  sd1: SyllabusItemWithStatus[];
+  sd2: SyllabusItemWithStatus[];
+  ai: SyllabusItemWithStatus[];
+  today: Record<string, number>;
+}
+
+export function getAllSyllabus(): Promise<CurriculumResponse> {
+  return apiFetch("/syllabus/all");
+}
+
+// ── Recap ─────────────────────────────────────────────────────────────────────
+
+export interface RecapOut {
+  id: number;
+  date: string;
+  summary: string;
+  weak_topics: string[];
+  recall_questions: string[];
+}
+
+export function getTodayRecap(): Promise<RecapOut> {
+  return apiFetch("/recap/today");
+}
+
+export function triggerRecapBuild(): Promise<RecapOut> {
+  return apiFetch("/recap/build", { method: "POST" });
+}
+
 // ── Teach-back ────────────────────────────────────────────────────────────────
 
 export function submitTeachBack(
