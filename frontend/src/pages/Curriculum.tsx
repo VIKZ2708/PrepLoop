@@ -10,8 +10,6 @@ const TRACKS = [
 ];
 
 function TopicRow({ item, track }: { item: SyllabusItemWithStatus; track: string }) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div
       className={`rounded-xl border transition-all duration-150 ${
@@ -22,48 +20,47 @@ function TopicRow({ item, track }: { item: SyllabusItemWithStatus; track: string
           : "border-[#21262d] bg-[#161b22]"
       }`}
     >
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left"
-      >
-        {/* Status dot */}
-        <span
-          className={`shrink-0 h-2.5 w-2.5 rounded-full ${
-            item.is_today
-              ? "bg-[#0071e3] ring-2 ring-[#0071e3]/30"
-              : item.completed
-              ? "bg-green-500"
-              : "bg-[#30363d]"
-          }`}
-        />
+      <div className="px-4 py-3">
+        <div className="flex items-start gap-3">
+          {/* Status dot */}
+          <span
+            className={`mt-1 shrink-0 h-2.5 w-2.5 rounded-full ${
+              item.is_today
+                ? "bg-[#0071e3] ring-2 ring-[#0071e3]/30"
+                : item.completed
+                ? "bg-green-500"
+                : "bg-[#30363d]"
+            }`}
+          />
 
-        <span className="text-xs text-[#8b949e] shrink-0 w-8">D{item.day_no}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-[#8b949e] shrink-0">Day {item.day_no}</span>
+              <span className={`text-sm font-semibold ${item.is_today ? "text-[#0071e3]" : item.completed ? "text-[#8b949e]" : "text-[#e6edf3]"}`}>
+                {item.title}
+              </span>
+              {item.is_today && (
+                <span className="rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-semibold text-[#0071e3]">Today</span>
+              )}
+              {item.completed && !item.is_today && (
+                <span className="rounded-full bg-green-900/30 px-2 py-0.5 text-xs font-medium text-green-500">Done</span>
+              )}
+            </div>
+            <p className="mt-1 text-sm text-[#8b949e] leading-relaxed">{item.description}</p>
+          </div>
 
-        <span className={`flex-1 text-sm font-medium ${item.is_today ? "text-[#0071e3]" : item.completed ? "text-[#8b949e]" : "text-[#e6edf3]"}`}>
-          {item.title}
-          {item.is_today && (
-            <span className="ml-2 rounded-full bg-[#0071e3]/10 px-2 py-0.5 text-xs font-semibold text-[#0071e3]">Today</span>
-          )}
-        </span>
-
-        {item.completed && !item.is_today && (
-          <span className="shrink-0 text-xs text-green-500">✓</span>
-        )}
-
-        <span className="shrink-0 text-xs text-[#3d444d]">{open ? "▲" : "▼"}</span>
-      </button>
-
-      {open && (
-        <div className="border-t border-[#21262d] px-4 py-3 flex items-start justify-between gap-4">
-          <p className="text-sm text-[#8b949e] leading-relaxed flex-1">{item.description}</p>
           <Link
-            to={`/study?track=${track}&day=${item.day_no}`}
-            className="shrink-0 rounded-lg bg-[#0071e3] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0058b3] transition-colors"
+            to={`/study?track=${track}`}
+            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+              item.is_today
+                ? "bg-[#0071e3] text-white hover:bg-[#0058b3]"
+                : "border border-[#30363d] text-[#8b949e] hover:border-[#0071e3] hover:text-[#e6edf3]"
+            }`}
           >
-            Study →
+            {item.is_today ? "Study now →" : "Study →"}
           </Link>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -75,7 +72,7 @@ function TrackPanel({ trackId, items }: { trackId: string; items: SyllabusItemWi
   return (
     <div>
       {/* Progress bar */}
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3">
         <div className="flex-1 h-1.5 rounded-full bg-[#21262d] overflow-hidden">
           <div
             className="h-full rounded-full bg-[#0071e3] transition-all duration-500"
@@ -154,9 +151,9 @@ export default function Curriculum() {
 
         {/* Topic list */}
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-12 animate-pulse rounded-xl bg-[#161b22]" />
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-[#161b22]" />
             ))}
           </div>
         ) : (

@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -116,10 +116,19 @@ export default function Study() {
 
       {/* Today's topic */}
       {syllabus && (
-        <div className="border-b border-[#21262d] bg-[#161b22] px-6 py-3">
-          <div className="mx-auto max-w-[1600px]">
-            <span className="text-xs text-[#8b949e] uppercase tracking-widest">Today — Day {syllabus.day_no}</span>
-            <h2 className="mt-0.5 text-base font-semibold text-[#e6edf3]">{syllabus.title}</h2>
+        <div className="border-b border-[#21262d] bg-[#161b22] px-6 py-4">
+          <div className="mx-auto max-w-[1600px] flex items-start justify-between gap-6">
+            <div>
+              <span className="text-xs text-[#8b949e] uppercase tracking-widest">Day {syllabus.day_no} · Today's topic</span>
+              <h2 className="mt-1 text-lg font-bold text-[#e6edf3]">{syllabus.title}</h2>
+              <p className="mt-1 text-sm text-[#8b949e] leading-relaxed max-w-2xl">{syllabus.description}</p>
+            </div>
+            <Link
+              to="/curriculum"
+              className="shrink-0 rounded-lg border border-[#30363d] px-3 py-1.5 text-xs text-[#8b949e] hover:border-[#0071e3] hover:text-[#e6edf3] transition-colors"
+            >
+              View curriculum →
+            </Link>
           </div>
         </div>
       )}
