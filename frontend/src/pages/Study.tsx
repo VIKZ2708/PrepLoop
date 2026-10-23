@@ -10,7 +10,62 @@ import {
   submitTeachBack,
   type StudySession,
   type TeachBackResponse,
+  type TopicContent,
 } from "../api/client";
+
+async function getTopicContent(id: number): Promise<TopicContent | null> {
+  const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+  const res = await fetch(`${API_URL}/content/${id}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+function StudyGuide({ content }: { content: TopicContent }) {
+  const [tab, setTab] = useState<"concepts" | "questions" | "diagrams" | "mistakes">("concepts");
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex gap-1 border-b border-[#21262d] px-3 py-2 shrink-0">
+        {([
+          ["concepts", "Key Concepts"],
+          ["questions", "Interview Qs"],
+          ["diagrams", "Diagrams"],
+          ["mistakes", "Pitfalls"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setTab(key)}
+            className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${tab === key ? "bg-[#0071e3] text-white" : "text-[#8b949e] hover:text-[#e6edf3]"}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1 overflow-auto px-4 py-3 space-y-2">
+        {tab === "concepts" && content.key_concepts?.map((c, i) => (
+          <div key={i} className="rounded-lg border border-[#21262d] bg-[#0d1117] p-3">
+            <p className="text-xs text-[#e6edf3] leading-relaxed">{c}</p>
+          </div>
+        ))}
+        {tab === "questions" && content.interview_questions?.map((q, i) => (
+          <div key={i} className="rounded-lg border border-[#21262d] bg-[#0d1117] p-3 space-y-1">
+            <p className="text-xs font-semibold text-[#0071e3]">Q{i + 1}: {q.question}</p>
+            <p className="text-xs text-[#8b949e] leading-relaxed">{q.answer}</p>
+          </div>
+        ))}
+        {tab === "diagrams" && content.diagrams_to_know?.map((d, i) => (
+          <div key={i} className="rounded-lg border border-[#21262d] bg-[#0d1117] p-3">
+            <p className="text-xs text-[#e6edf3] leading-relaxed">{d}</p>
+          </div>
+        ))}
+        {tab === "mistakes" && content.common_mistakes?.map((m, i) => (
+          <div key={i} className="rounded-lg border border-red-800/30 bg-red-900/5 p-3">
+            <p className="text-xs text-[#e6edf3] leading-relaxed">{m}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const Excalidraw = lazy(() =>
   import("@excalidraw/excalidraw").then((m) => ({ default: m.Excalidraw }))
@@ -40,6 +95,13 @@ export default function Study() {
   const { data: session } = useQuery<StudySession>({
     queryKey: ["study", track],
     queryFn: () => getTodayStudySession(track),
+  });
+
+  const { data: content } = useQuery<TopicContent | null>({
+    queryKey: ["content", syllabus?.id],
+    queryFn: () => (syllabus ? getTopicContent(syllabus.id) : null),
+    enabled: !!syllabus,
+    staleTime: 3_600_000,
   });
 
   const patch = useMutation({
@@ -133,7 +195,7 @@ export default function Study() {
         </div>
       )}
 
-      {/* Main: notes + diagram */}
+      {/* Main: notes + guide + diagram */}
       <div className="mx-auto flex max-w-[1600px] gap-0" style={{ height: "calc(100vh - 180px)" }}>
         {/* Notes pane */}
         <div className="flex flex-1 flex-col border-r border-[#21262d]">
@@ -171,6 +233,16 @@ export default function Study() {
             />
           )}
         </div>
+
+        {/* Study guide pane */}
+        {content && (
+          <div className="flex w-72 shrink-0 flex-col border-r border-[#21262d]">
+            <div className="flex items-center border-b border-[#21262d] px-4 py-2 shrink-0">
+              <span className="text-xs font-medium text-[#8b949e] uppercase tracking-widest">Study Guide</span>
+            </div>
+            <StudyGuide content={content} />
+          </div>
+        )}
 
         {/* Right pane: whiteboard + teach-back stacked */}
         <div className="flex flex-1 flex-col">

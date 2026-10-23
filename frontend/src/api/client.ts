@@ -193,6 +193,50 @@ export function triggerRecapBuild(): Promise<RecapOut> {
   return apiFetch("/recap/build", { method: "POST" });
 }
 
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+export interface TopicContent {
+  summary: string | null;
+  key_concepts: string[] | null;
+  interview_questions: Array<{ question: string; answer: string }> | null;
+  diagrams_to_know: string[] | null;
+  common_mistakes: string[] | null;
+  starter_notes: string | null;
+}
+
+export interface DashboardToday {
+  track: string;
+  study: {
+    complete: boolean;
+    topic_title: string;
+    topic_description: string;
+    day_no: number;
+    syllabus_item_id: number;
+    notes_preview: string | null;
+    content: TopicContent | null;
+  };
+  quiz: {
+    locked: boolean;
+    complete: boolean;
+    last_score: number | null;
+    attempt_id: number | null;
+  };
+  build: {
+    locked: boolean;
+    complete: boolean;
+    log_preview: string | null;
+  };
+  recap: {
+    locked: boolean;
+    complete: boolean;
+    summary: string | null;
+  };
+}
+
+export function getDashboardToday(track = "sd1"): Promise<DashboardToday> {
+  return apiFetch(`/dashboard/today?track=${track}`);
+}
+
 // ── Teach-back ────────────────────────────────────────────────────────────────
 
 export function submitTeachBack(
