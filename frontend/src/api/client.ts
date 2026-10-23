@@ -202,6 +202,8 @@ export interface TopicContent {
   diagrams_to_know: string[] | null;
   common_mistakes: string[] | null;
   starter_notes: string | null;
+  diagram_sections: Array<{ title: string; description: string; mermaid: string }> | null;
+  code_examples: Array<{ title: string; description: string; language: string; code: string }> | null;
 }
 
 export interface DashboardToday {
