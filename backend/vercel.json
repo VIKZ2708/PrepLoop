@@ -13,6 +13,10 @@
     {
       "path": "/recap/build",
       "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/content/generate-all",
+      "schedule": "0 1 * * *"
     }
   ]
 }

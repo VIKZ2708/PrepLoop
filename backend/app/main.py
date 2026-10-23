@@ -9,6 +9,8 @@ from app.api.study import router as study_router
 from app.api.project import router as project_router
 from app.api.quiz import router as quiz_router
 from app.api.recap import router as recap_router
+from app.api.content import router as content_router
+from app.api.dashboard import router as dashboard_router
 
 
 @asynccontextmanager
@@ -39,3 +41,5 @@ app.include_router(study_router)
 app.include_router(project_router)
 app.include_router(quiz_router)
 app.include_router(recap_router)
+app.include_router(content_router)
+app.include_router(dashboard_router)

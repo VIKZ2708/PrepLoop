@@ -150,3 +150,21 @@ class NoteChunk(Base):
     embedding = mapped_column(Vector(1536), nullable=True)
 
     session: Mapped[Optional["StudySession"]] = relationship(back_populates="chunks")
+
+
+class TopicContent(Base):
+    __tablename__ = "topic_content"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    syllabus_item_id: Mapped[int] = mapped_column(
+        sa.ForeignKey("syllabus_items.id"), nullable=False, unique=True
+    )
+    summary: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
+    key_concepts: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
+    interview_questions: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
+    diagrams_to_know: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
+    common_mistakes: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
+    starter_notes: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
+    generated_at: Mapped[Optional[datetime]] = mapped_column(
+        sa.DateTime(timezone=True), nullable=True
+    )
