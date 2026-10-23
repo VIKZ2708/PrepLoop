@@ -165,6 +165,8 @@ class TopicContent(Base):
     diagrams_to_know: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
     common_mistakes: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
     starter_notes: Mapped[Optional[str]] = mapped_column(sa.Text, nullable=True)
+    diagram_sections: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
+    code_examples: Mapped[Optional[list]] = mapped_column(sa.JSON, nullable=True)
     generated_at: Mapped[Optional[datetime]] = mapped_column(
         sa.DateTime(timezone=True), nullable=True
     )

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
 from app.models.models import SyllabusItem, TopicContent
 from app.services.content_generator import generate_topic_content
+from app.services.enrichment import generate_diagrams, generate_code_examples
 
 router = APIRouter()
 
@@ -22,6 +23,8 @@ class TopicContentOut(BaseModel):
     diagrams_to_know: Optional[list] = None
     common_mistakes: Optional[list] = None
     starter_notes: Optional[str] = None
+    diagram_sections: Optional[list] = None
+    code_examples: Optional[list] = None
 
     model_config = {"from_attributes": True}
 
@@ -30,6 +33,12 @@ class GenerateAllResponse(BaseModel):
     generated: int
     skipped: int
     total: int
+
+
+class EnrichResponse(BaseModel):
+    syllabus_item_id: int
+    diagrams: int
+    code_examples: int
 
 
 @router.get("/content/{syllabus_item_id}", response_model=TopicContentOut)
@@ -43,12 +52,43 @@ async def get_topic_content(syllabus_item_id: int, db: AsyncSession = Depends(ge
     return content
 
 
+@router.post("/content/{syllabus_item_id}/enrich", response_model=EnrichResponse)
+async def enrich_topic(syllabus_item_id: int, db: AsyncSession = Depends(get_db)):
+    """Generate diagrams and code examples for a topic (can re-run to refresh)."""
+    item_result = await db.execute(
+        select(SyllabusItem).where(SyllabusItem.id == syllabus_item_id)
+    )
+    item = item_result.scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Syllabus item not found")
+
+    tc_result = await db.execute(
+        select(TopicContent).where(TopicContent.syllabus_item_id == syllabus_item_id)
+    )
+    tc = tc_result.scalar_one_or_none()
+    if not tc:
+        raise HTTPException(status_code=404, detail="Base content not yet generated — run /content/generate-all first")
+
+    diagrams = generate_diagrams(item.title, item.description, item.track, tc.diagrams_to_know or [])
+    code_examples = generate_code_examples(item.title, item.description, item.track, tc.key_concepts or [])
+
+    tc.diagram_sections = diagrams
+    tc.code_examples = code_examples
+    await db.commit()
+
+    return EnrichResponse(
+        syllabus_item_id=syllabus_item_id,
+        diagrams=len(diagrams),
+        code_examples=len(code_examples),
+    )
+
+
 @router.api_route("/content/generate-all", methods=["GET", "POST"], response_model=GenerateAllResponse)
 async def generate_all_content(
     force: bool = False,
     db: AsyncSession = Depends(get_db),
 ):
-    """Generate content for all syllabus items. Skips items already generated unless force=true."""
+    """Generate base content for all syllabus items. Skips already-generated unless force=true."""
     items_result = await db.execute(
         select(SyllabusItem).order_by(SyllabusItem.track, SyllabusItem.day_no)
     )
@@ -64,7 +104,6 @@ async def generate_all_content(
         if item.id in existing_ids and not force:
             skipped += 1
             continue
-
         try:
             data = generate_topic_content(item.title, item.description, item.track)
         except Exception:
@@ -83,7 +122,7 @@ async def generate_all_content(
             existing.starter_notes = data.get("starter_notes")
             existing.generated_at = datetime.now(timezone.utc)
         else:
-            content = TopicContent(
+            db.add(TopicContent(
                 syllabus_item_id=item.id,
                 summary=data.get("summary"),
                 key_concepts=data.get("key_concepts"),
@@ -92,8 +131,7 @@ async def generate_all_content(
                 common_mistakes=data.get("common_mistakes"),
                 starter_notes=data.get("starter_notes"),
                 generated_at=datetime.now(timezone.utc),
-            )
-            db.add(content)
+            ))
 
         await db.commit()
         generated += 1

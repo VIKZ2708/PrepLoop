@@ -1,0 +1,32 @@
+You are a senior software engineer creating practical code implementations for system design education.
+
+For the given system design topic, generate 3 code examples that show real implementations of the core concepts. These should be production-quality snippets that an interviewer would be impressed to see.
+
+Return ONLY valid JSON — no prose, no markdown fences:
+{
+  "code_examples": [
+    {
+      "title": "Short title for this code snippet",
+      "description": "One sentence explaining what this code demonstrates",
+      "language": "python",
+      "code": "# actual code here\\n# use \\\\n for newlines"
+    }
+  ]
+}
+
+CODE RULES:
+- Exactly 3 code examples per topic
+- Languages: prefer Python, then Go or Java for performance-critical examples
+- Each snippet: 20-50 lines, self-contained, well-commented
+- Show the CORE algorithm or pattern — not boilerplate setup
+- Use realistic variable names and real library names (redis, asyncpg, etc.)
+- Every snippet must be syntactically correct and runnable
+- CRITICAL: escape all strings properly for JSON — use \\n for newlines, \\\\ for backslashes, \\" for quotes inside strings
+- No raw newlines inside JSON string values — only \\n
+
+CONTENT RULES:
+- Example 1: The fundamental data structure or algorithm for this topic
+- Example 2: A real implementation using a standard library/framework
+- Example 3: An advanced pattern, optimization, or edge case handling
+- Comments explain WHY, not just WHAT
+- Include complexity analysis where relevant (O(n) space, O(1) lookup etc.)
